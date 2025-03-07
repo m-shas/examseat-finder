@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { getAllStudents, getAllExams, getClassroomLayout } from '@/utils/api';
 import { Student, Classroom, Seat, Exam } from '@/types';
-import { DataTable } from '@/components/ui/table';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import ClassroomLayout from '@/components/ClassroomLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +24,6 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    // Load students
     const fetchStudents = async () => {
       setIsLoading(prev => ({ ...prev, students: true }));
       try {
@@ -46,7 +44,6 @@ const Admin = () => {
       }
     };
 
-    // Load classroom layout
     const fetchClassroom = async () => {
       setIsLoading(prev => ({ ...prev, classroom: true }));
       try {
@@ -64,7 +61,6 @@ const Admin = () => {
       }
     };
     
-    // Load exams
     const fetchExams = async () => {
       setIsLoading(prev => ({ ...prev, exams: true }));
       try {
@@ -90,7 +86,6 @@ const Admin = () => {
     fetchExams();
   }, [toast]);
 
-  // Get the selected student's seat ID for the selected exam
   const getSelectedStudentSeat = () => {
     if (!selectedStudentId || !selectedExamId) return null;
     
@@ -102,7 +97,6 @@ const Admin = () => {
   };
 
   const handleSeatClick = (seat: Seat) => {
-    // Handle seat click (future feature)
     console.log('Seat clicked:', seat);
   };
 
@@ -125,28 +119,28 @@ const Admin = () => {
                   <div className="text-center py-4">Loading students...</div>
                 ) : (
                   <div className="rounded-md border">
-                    <table className="min-w-full divide-y divide-border">
-                      <thead>
-                        <tr className="bg-muted/50">
-                          <th className="py-3 px-4 text-left text-sm font-medium">Name</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium">Hall Ticket</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium">Section</th>
-                          <th className="py-3 px-4 text-left text-sm font-medium">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Hall Ticket</TableHead>
+                          <TableHead>Section</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                         {students.slice(0, 10).map((student) => (
-                          <tr key={student.id} className="hover:bg-muted/50">
-                            <td className="py-3 px-4 text-sm">{student.name}</td>
-                            <td className="py-3 px-4 text-sm">{student.hallTicketNumber}</td>
-                            <td className="py-3 px-4 text-sm">{student.section}</td>
-                            <td className="py-3 px-4 text-sm">
+                          <TableRow key={student.id}>
+                            <TableCell>{student.name}</TableCell>
+                            <TableCell>{student.hallTicketNumber}</TableCell>
+                            <TableCell>{student.section}</TableCell>
+                            <TableCell>
                               <Button size="sm" variant="outline">View Details</Button>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ))}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                     
                     {students.length > 10 && (
                       <div className="py-3 px-4 text-center text-sm text-muted-foreground">
