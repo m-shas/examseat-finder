@@ -3,7 +3,20 @@ export interface Student {
   id: string;
   name: string;
   hallTicketNumber: string;
+  section: 'A' | 'B' | 'C';
+  exams: ExamSeatAllocation[];
+}
+
+export interface ExamSeatAllocation {
+  examId: string;
   seatId: string;
+}
+
+export interface Exam {
+  id: string;
+  name: string;
+  date: string;
+  duration: string;
 }
 
 export interface Seat {
@@ -44,4 +57,5 @@ export interface SearchResult {
   seat: Seat;
   classroom: Classroom;
   nearbyLandmarks: Landmark[];
+  exam?: Exam;
 }

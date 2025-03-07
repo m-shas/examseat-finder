@@ -32,9 +32,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     setMounted(true);
   }, []);
 
-  // Calculate SVG dimensions
-  const cellSize = 60;
-  const padding = 80; // Increased padding to make room for landmarks
+  // Calculate SVG dimensions with improved spacing
+  const cellSize = 65; // Increased cell size for better spacing
+  const padding = 100; // Increased padding for landmarks
   const width = columns * cellSize + 2 * padding;
   const height = rows * cellSize + 2 * padding;
 
@@ -57,19 +57,19 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     };
 
     return (
-      <g key={seat.id} onClick={handleClick} className={cn("transition-opacity", mounted ? "opacity-100" : "opacity-0")}>
+      <g key={seat.id} onClick={handleClick} className={cn("transition-opacity cursor-pointer", mounted ? "opacity-100" : "opacity-0")}>
         <rect
           x={x}
           y={y}
-          width={cellSize - 10}
-          height={cellSize - 10}
+          width={cellSize - 15} // Slightly smaller for better spacing
+          height={cellSize - 15}
           rx={8}
           className={`seat ${seatClass}`}
           style={{ transitionDelay: `${(seat.row + seat.column) * 50}ms` }}
         />
         <text
-          x={x + (cellSize - 10) / 2}
-          y={y + (cellSize - 10) / 2}
+          x={x + (cellSize - 15) / 2}
+          y={y + (cellSize - 15) / 2}
           textAnchor="middle"
           dominantBaseline="middle"
           className="text-xs fill-current text-foreground pointer-events-none"
