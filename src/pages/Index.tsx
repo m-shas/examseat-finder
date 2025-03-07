@@ -4,8 +4,8 @@ import Layout from '@/components/Layout';
 import SearchBar from '@/components/SearchBar';
 import ClassroomLayout from '@/components/ClassroomLayout';
 import SeatDetails from '@/components/SeatDetails';
-import { SearchResult, Exam } from '@/types';
-import { searchByHallTicketAndExam, getAllExams } from '@/utils/api';
+import { SearchResult } from '@/types';
+import { searchByHallTicketAndExam } from '@/utils/api';
 import { useToast } from '@/components/ui/use-toast';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -28,7 +28,7 @@ const Index = () => {
         setSearchResult(result);
         toast({
           title: "Seat found!",
-          description: `Found seat for ${result.student.name} for ${result.exam?.name || 'exam'}`,
+          description: `Found seat for ${result.student.name} in ${result.classroom.name} for ${result.exam?.name || 'exam'}`,
         });
       } else {
         setSearchResult(null);
@@ -89,6 +89,7 @@ const Index = () => {
                 seat={searchResult.seat}
                 classroom={searchResult.classroom}
                 nearbyLandmarks={searchResult.nearbyLandmarks}
+                exam={searchResult.exam}
               />
             </div>
           </div>

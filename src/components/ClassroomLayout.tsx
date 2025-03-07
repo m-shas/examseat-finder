@@ -33,8 +33,8 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
   }, []);
 
   // Calculate SVG dimensions with improved spacing
-  const cellSize = 65; // Increased cell size for better spacing
-  const padding = 100; // Increased padding for landmarks
+  const cellSize = 65; // Cell size for better spacing
+  const padding = 120; // Increased padding for landmarks
   const width = columns * cellSize + 2 * padding;
   const height = rows * cellSize + 2 * padding;
 
@@ -57,7 +57,15 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     };
 
     return (
-      <g key={seat.id} onClick={handleClick} className={cn("transition-opacity cursor-pointer", mounted ? "opacity-100" : "opacity-0")}>
+      <g 
+        key={seat.id} 
+        onClick={handleClick} 
+        className={cn(
+          "transition-opacity cursor-pointer", 
+          mounted ? "opacity-100" : "opacity-0", 
+          isInteractive ? "hover:opacity-80" : ""
+        )}
+      >
         <rect
           x={x}
           y={y}
@@ -88,9 +96,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     switch (landmark.type) {
       case 'board':
         x = landmark.position.x * cellSize;
-        y = padding / 2 - 20;
-        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 180;
-        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 20;
+        y = padding / 2 - 40; // Position the board higher
+        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 200;
+        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 25;
         return (
           <g key={landmark.id} className="landmark">
             <rect
@@ -116,9 +124,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
       
       case 'dais':
         x = landmark.position.x * cellSize;
-        y = padding / 2 + 15;
-        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 120;
-        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 50;
+        y = padding / 2 + 0; // Position the dais closer to the board
+        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 140;
+        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 40;
         return (
           <g key={landmark.id} className="landmark">
             <rect
@@ -153,7 +161,7 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
             </g>
           );
         } else if (landmark.orientation === 'right') {
-          x = width - 25;
+          x = width - 30;
           y = landmark.position.y * cellSize + padding;
           return (
             <g key={landmark.id} className="landmark opacity-80">
@@ -163,9 +171,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
           );
         } else if (landmark.orientation === 'bottom') {
           x = landmark.position.x * cellSize;
-          y = height - 30;
+          y = height - 40;
           width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 80;
-          height = 20;
+          height = 30;
           return (
             <g key={landmark.id} className="landmark opacity-80">
               <rect
@@ -183,7 +191,7 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
                 dominantBaseline="middle"
                 className="text-xs fill-current text-accent-foreground"
               >
-                Door
+                Main Door
               </text>
               <title>{landmark.description}</title>
             </g>
@@ -201,16 +209,16 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
               <rect
                 x={x}
                 y={y}
-                width={10}
+                width={15}
                 height={height}
                 rx={0}
-                className="fill-blue-100 stroke-blue-200"
+                className="fill-blue-100 stroke-blue-200 stroke-1"
               />
               <title>{landmark.description}</title>
             </g>
           );
         } else if (landmark.orientation === 'right') {
-          x = width - 15;
+          x = width - 20;
           y = landmark.position.y * cellSize;
           height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 300;
           return (
@@ -218,10 +226,10 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
               <rect
                 x={x}
                 y={y}
-                width={10}
+                width={15}
                 height={height}
                 rx={0}
-                className="fill-blue-100 stroke-blue-200"
+                className="fill-blue-100 stroke-blue-200 stroke-1"
               />
               <title>{landmark.description}</title>
             </g>
@@ -231,10 +239,10 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
       
       case 'teacher':
         x = landmark.position.x * cellSize + 30;
-        y = padding / 2 + 40;
+        y = padding / 2 + 20; // Position the teacher avatar on the dais
         return (
           <g key={landmark.id} className="landmark">
-            <MessageSquare className="h-6 w-6 fill-primary/20 stroke-primary" x={x} y={y} />
+            <MessageSquare className="h-7 w-7 fill-primary/20 stroke-primary" x={x} y={y} />
             <title>{landmark.description}</title>
           </g>
         );
@@ -251,7 +259,7 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     }
   });
 
-  // Room outline
+  // Room outline with better presentation
   const roomOutline = (
     <rect
       x={padding / 2}
@@ -259,19 +267,19 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
       width={width - padding}
       height={height - padding}
       rx={0}
-      className="fill-none stroke-muted-foreground/30 stroke-[2px]"
+      className="fill-none stroke-muted-foreground/40 stroke-[2px]"
     />
   );
 
-  // Room label
+  // Room label with classroom name from props (if provided)
   const roomLabel = (
     <text
       x={width / 2}
-      y={height / 2 - 40}
+      y={height - 70}
       textAnchor="middle"
       className="text-lg fill-muted-foreground font-medium"
     >
-      Classroom
+      Exam Hall
     </text>
   );
 
@@ -279,11 +287,11 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
   const roomDimensions = (
     <text
       x={width / 2}
-      y={height / 2 - 10}
+      y={height - 45}
       textAnchor="middle"
       className="text-sm fill-muted-foreground"
     >
-      26' x 40'
+      {rows} rows × {columns} columns
     </text>
   );
 
@@ -297,6 +305,23 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
             viewBox={`0 0 ${width} ${height}`}
             className="max-w-full h-auto"
           >
+            {/* Subtle background pattern */}
+            <pattern id="grid-pattern" width={cellSize} height={cellSize} patternUnits="userSpaceOnUse">
+              <path 
+                d={`M ${cellSize} 0 L 0 0 0 ${cellSize}`}
+                fill="none"
+                stroke="rgba(230,230,230,0.3)"
+                strokeWidth="0.5"
+              />
+            </pattern>
+            <rect 
+              x={padding / 2} 
+              y={padding / 2} 
+              width={width - padding} 
+              height={height - padding} 
+              fill="url(#grid-pattern)"
+            />
+            
             {/* Room outline */}
             {roomOutline}
             
@@ -304,7 +329,7 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
             {roomLabel}
             {roomDimensions}
             
-            {/* Background grid */}
+            {/* Background grid for better orientation */}
             <g className="grid">
               {Array.from({ length: rows + 1 }).map((_, rowIndex) => (
                 <line
