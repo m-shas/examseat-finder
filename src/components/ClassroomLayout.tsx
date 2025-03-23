@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Landmark, Seat } from '@/types';
 import AnimatedTransition from './AnimatedTransition';
 import { cn } from '@/lib/utils';
-import { DoorClosed, MessageSquare } from 'lucide-react';
 
 interface ClassroomLayoutProps {
   rows: number;
@@ -32,9 +31,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     setMounted(true);
   }, []);
 
-  // Calculate SVG dimensions with improved spacing
-  const cellSize = 65; // Cell size for better spacing
-  const padding = 120; // Increased padding for landmarks
+  // Calculate SVG dimensions
+  const cellSize = 60;
+  const padding = 40;
   const width = columns * cellSize + 2 * padding;
   const height = rows * cellSize + 2 * padding;
 
@@ -57,27 +56,19 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
     };
 
     return (
-      <g 
-        key={seat.id} 
-        onClick={handleClick} 
-        className={cn(
-          "transition-opacity cursor-pointer", 
-          mounted ? "opacity-100" : "opacity-0", 
-          isInteractive ? "hover:opacity-80" : ""
-        )}
-      >
+      <g key={seat.id} onClick={handleClick} className={cn("transition-opacity", mounted ? "opacity-100" : "opacity-0")}>
         <rect
           x={x}
           y={y}
-          width={cellSize - 15} // Slightly smaller for better spacing
-          height={cellSize - 15}
+          width={cellSize - 10}
+          height={cellSize - 10}
           rx={8}
           className={`seat ${seatClass}`}
           style={{ transitionDelay: `${(seat.row + seat.column) * 50}ms` }}
         />
         <text
-          x={x + (cellSize - 15) / 2}
-          y={y + (cellSize - 15) / 2}
+          x={x + (cellSize - 10) / 2}
+          y={y + (cellSize - 10) / 2}
           textAnchor="middle"
           dominantBaseline="middle"
           className="text-xs fill-current text-foreground pointer-events-none"
@@ -90,210 +81,45 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
 
   // Generate landmark elements
   const landmarkElements = landmarks.map((landmark) => {
-    // Calculate position based on the landmark's coordinates and orientation
-    let x, y, width, height;
+    const x = landmark.position.x * cellSize + padding;
+    const y = landmark.position.y * cellSize + padding;
     
+    // Determine icon based on landmark type
+    let icon;
     switch (landmark.type) {
-      case 'board':
-        x = landmark.position.x * cellSize;
-        y = padding / 2 - 40; // Position the board higher
-        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 200;
-        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 25;
-        return (
-          <g key={landmark.id} className="landmark">
-            <rect
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              rx={1}
-              className="fill-accent stroke-accent-foreground"
-            />
-            <text
-              x={x + width / 2}
-              y={y + height / 2}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-xs fill-current text-accent-foreground"
-            >
-              White Board
-            </text>
-            <title>{landmark.description}</title>
-          </g>
-        );
-      
-      case 'dais':
-        x = landmark.position.x * cellSize;
-        y = padding / 2 + 0; // Position the dais closer to the board
-        width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 140;
-        height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 40;
-        return (
-          <g key={landmark.id} className="landmark">
-            <rect
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              rx={2}
-              className="fill-muted stroke-muted-foreground"
-            />
-            <text
-              x={x + width / 2}
-              y={y + height / 2}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              className="text-xs fill-current text-muted-foreground"
-            >
-              Lecture Dais
-            </text>
-            <title>{landmark.description}</title>
-          </g>
-        );
-      
       case 'door':
-        if (landmark.orientation === 'left') {
-          x = 5;
-          y = landmark.position.y * cellSize + padding;
-          return (
-            <g key={landmark.id} className="landmark opacity-80">
-              <DoorClosed className="h-8 w-8 stroke-accent" x={x} y={y} />
-              <title>{landmark.description}</title>
-            </g>
-          );
-        } else if (landmark.orientation === 'right') {
-          x = width - 30;
-          y = landmark.position.y * cellSize + padding;
-          return (
-            <g key={landmark.id} className="landmark opacity-80">
-              <DoorClosed className="h-8 w-8 stroke-accent" x={x} y={y} />
-              <title>{landmark.description}</title>
-            </g>
-          );
-        } else if (landmark.orientation === 'bottom') {
-          x = landmark.position.x * cellSize;
-          y = height - 40;
-          width = landmark.dimension?.width ? landmark.dimension.width * cellSize : 80;
-          height = 30;
-          return (
-            <g key={landmark.id} className="landmark opacity-80">
-              <rect
-                x={x}
-                y={y}
-                width={width}
-                height={height}
-                rx={2}
-                className="fill-accent stroke-accent-foreground"
-              />
-              <text
-                x={x + width / 2}
-                y={y + height / 2}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                className="text-xs fill-current text-accent-foreground"
-              >
-                Main Door
-              </text>
-              <title>{landmark.description}</title>
-            </g>
-          );
-        }
-        return null;
-      
-      case 'window':
-        if (landmark.orientation === 'left') {
-          x = 5;
-          y = landmark.position.y * cellSize;
-          height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 300;
-          return (
-            <g key={landmark.id} className="landmark opacity-80">
-              <rect
-                x={x}
-                y={y}
-                width={15}
-                height={height}
-                rx={0}
-                className="fill-blue-100 stroke-blue-200 stroke-1"
-              />
-              <title>{landmark.description}</title>
-            </g>
-          );
-        } else if (landmark.orientation === 'right') {
-          x = width - 20;
-          y = landmark.position.y * cellSize;
-          height = landmark.dimension?.height ? landmark.dimension.height * cellSize : 300;
-          return (
-            <g key={landmark.id} className="landmark opacity-80">
-              <rect
-                x={x}
-                y={y}
-                width={15}
-                height={height}
-                rx={0}
-                className="fill-blue-100 stroke-blue-200 stroke-1"
-              />
-              <title>{landmark.description}</title>
-            </g>
-          );
-        }
-        return null;
-      
-      case 'teacher':
-        x = landmark.position.x * cellSize + 30;
-        y = padding / 2 + 20; // Position the teacher avatar on the dais
-        return (
-          <g key={landmark.id} className="landmark">
-            <MessageSquare className="h-7 w-7 fill-primary/20 stroke-primary" x={x} y={y} />
-            <title>{landmark.description}</title>
-          </g>
+        icon = (
+          <rect x={x} y={y} width={20} height={30} rx={2} className="fill-accent" />
         );
-      
+        break;
+      case 'window':
+        icon = (
+          <rect x={x} y={y} width={30} height={15} rx={2} className="fill-accent" />
+        );
+        break;
+      case 'teacher':
+        icon = (
+          <rect x={x} y={y} width={30} height={20} rx={2} className="fill-accent" />
+        );
+        break;
+      case 'board':
+        icon = (
+          <rect x={x} y={y} width={40} height={10} rx={1} className="fill-accent" />
+        );
+        break;
       default:
-        x = landmark.position.x * cellSize + padding;
-        y = landmark.position.y * cellSize + padding;
-        return (
-          <g key={landmark.id} className="landmark opacity-80">
-            <circle cx={x} cy={y} r={8} className="fill-accent" />
-            <title>{landmark.description}</title>
-          </g>
+        icon = (
+          <circle cx={x} cy={y} r={8} className="fill-accent" />
         );
     }
+    
+    return (
+      <g key={landmark.id} className="landmark opacity-80">
+        {icon}
+        <title>{landmark.description}</title>
+      </g>
+    );
   });
-
-  // Room outline with better presentation
-  const roomOutline = (
-    <rect
-      x={padding / 2}
-      y={padding / 2}
-      width={width - padding}
-      height={height - padding}
-      rx={0}
-      className="fill-none stroke-muted-foreground/40 stroke-[2px]"
-    />
-  );
-
-  // Room label with classroom name from props (if provided)
-  const roomLabel = (
-    <text
-      x={width / 2}
-      y={height - 70}
-      textAnchor="middle"
-      className="text-lg fill-muted-foreground font-medium"
-    >
-      Exam Hall
-    </text>
-  );
-
-  // Room dimensions
-  const roomDimensions = (
-    <text
-      x={width / 2}
-      y={height - 45}
-      textAnchor="middle"
-      className="text-sm fill-muted-foreground"
-    >
-      {rows} rows × {columns} columns
-    </text>
-  );
 
   return (
     <div className="w-full overflow-auto flex flex-col items-center">
@@ -305,33 +131,9 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
             viewBox={`0 0 ${width} ${height}`}
             className="max-w-full h-auto"
           >
-            {/* Subtle background pattern */}
-            <pattern id="grid-pattern" width={cellSize} height={cellSize} patternUnits="userSpaceOnUse">
-              <path 
-                d={`M ${cellSize} 0 L 0 0 0 ${cellSize}`}
-                fill="none"
-                stroke="rgba(230,230,230,0.3)"
-                strokeWidth="0.5"
-              />
-            </pattern>
-            <rect 
-              x={padding / 2} 
-              y={padding / 2} 
-              width={width - padding} 
-              height={height - padding} 
-              fill="url(#grid-pattern)"
-            />
-            
-            {/* Room outline */}
-            {roomOutline}
-            
-            {/* Room label and dimensions */}
-            {roomLabel}
-            {roomDimensions}
-            
-            {/* Background grid for better orientation */}
+            {/* Background grid */}
             <g className="grid">
-              {Array.from({ length: rows + 1 }).map((_, rowIndex) => (
+              {Array.from({ length: rows }).map((_, rowIndex) => (
                 <line
                   key={`row-${rowIndex}`}
                   x1={padding / 2}
@@ -342,7 +144,7 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
                   strokeWidth="1"
                 />
               ))}
-              {Array.from({ length: columns + 1 }).map((_, colIndex) => (
+              {Array.from({ length: columns }).map((_, colIndex) => (
                 <line
                   key={`col-${colIndex}`}
                   x1={colIndex * cellSize + padding}
@@ -392,10 +194,6 @@ const ClassroomLayout: React.FC<ClassroomLayoutProps> = ({
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 bg-accent rounded"></div>
               <span className="text-sm">Landmark</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 bg-blue-100 rounded"></div>
-              <span className="text-sm">Window</span>
             </div>
           </div>
         </AnimatedTransition>
